@@ -19,7 +19,14 @@ class _IntermediateIteratorChain:
         return _IntermediateIteratorChain(iterator)
 
     def distinct(self):
-        pass
+        iterator = self._distinct()
+        return _IntermediateIteratorChain(iterator)
+
+    def _distinct(self):
+        seen = set()
+        for item in itertools.filterfalse(seen.__contains__, self._iterator):
+            seen.add(item)
+            yield item
 
     def limit(self, max_size):
         iterator = itertools.islice(self._iterator, max_size)

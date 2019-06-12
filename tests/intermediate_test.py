@@ -83,3 +83,13 @@ def test_limit():
     new_intermediate = test_object.limit(3)
 
     assert new_intermediate.list() == test_iterable[:3]
+
+
+def test_distinct():
+    test_iterable = [4, 3, 4, 5, 1, 3, 4]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    new_intermediate = test_object.distinct()
+
+    assert new_intermediate.list() == [4, 3, 5, 1]
