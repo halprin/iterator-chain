@@ -125,3 +125,26 @@ def test_any_match_false():
     actual_match = test_object.any_match(lambda item: item == test_value)
 
     assert actual_match == (test_value in test_iterable)
+
+
+def test_none_match_false():
+    test_value = 8
+    test_iterable = [4, 3, test_value, 5, 1]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_match = test_object.none_match(lambda item: item == test_value)
+
+    assert actual_match == (test_value not in test_iterable)
+
+
+def test_none_match_true():
+    test_iterable = [4, 3, 8, 5, 1]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    test_value = 26
+    actual_match = test_object.none_match(lambda item: item == test_value)
+
+    assert actual_match == (test_value not in test_iterable)
+

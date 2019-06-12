@@ -78,8 +78,7 @@ class _IntermediateIteratorChain:
             item_matches = function(item)
             if item_matches:
                 return True
-
         return False
 
     def none_match(self, function):
-        pass
+        return not self.any_match(function)
