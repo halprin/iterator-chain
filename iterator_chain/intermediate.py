@@ -74,7 +74,12 @@ class _IntermediateIteratorChain:
         pass
 
     def any_match(self, function):
-        pass
+        for item in self._iterator:
+            item_matches = function(item)
+            if item_matches:
+                return True
+
+        return False
 
     def none_match(self, function):
         pass

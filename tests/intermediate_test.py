@@ -103,3 +103,25 @@ def test_reduce():
     actual_reduction = test_object.reduce(lambda first, second: first * second)
 
     assert actual_reduction == test_iterable[0] * test_iterable[1] * test_iterable[2] * test_iterable[3] * test_iterable[4]
+
+
+def test_any_match_true():
+    test_value = 8
+    test_iterable = [4, 3, test_value, 5, 1]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_match = test_object.any_match(lambda item: item == test_value)
+
+    assert actual_match == (test_value in test_iterable)
+
+
+def test_any_match_false():
+    test_iterable = [4, 3, 8, 5, 1]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    test_value = 26
+    actual_match = test_object.any_match(lambda item: item == test_value)
+
+    assert actual_match == (test_value in test_iterable)
