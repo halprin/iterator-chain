@@ -93,3 +93,13 @@ def test_distinct():
     new_intermediate = test_object.distinct()
 
     assert new_intermediate.list() == [4, 3, 5, 1]
+
+
+def test_reduce():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_reduction = test_object.reduce(lambda first, second: first * second)
+
+    assert actual_reduction == test_iterable[0] * test_iterable[1] * test_iterable[2] * test_iterable[3] * test_iterable[4]

@@ -1,4 +1,5 @@
 import itertools
+import functools
 
 
 class _IntermediateIteratorChain:
@@ -64,7 +65,7 @@ class _IntermediateIteratorChain:
         pass
 
     def reduce(self, function):
-        pass
+        return functools.reduce(function, self._iterator)
 
     def for_each(self, function):
         pass
