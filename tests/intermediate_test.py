@@ -167,3 +167,13 @@ def test_all_match_false():
     actual_match = test_object.all_match(lambda item: item < 26)
 
     assert actual_match is False
+
+
+def test_count():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_count = test_object.count()
+
+    assert actual_count == len(test_iterable)

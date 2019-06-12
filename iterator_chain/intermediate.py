@@ -47,7 +47,7 @@ class _IntermediateIteratorChain:
         return list(self._iterator)
 
     def count(self):
-        pass
+        return sum(1 for _ in self._iterator)
 
     def first(self, default=None):
         return next(itertools.islice(self._iterator, 1), default)
