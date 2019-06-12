@@ -61,8 +61,15 @@ class _IntermediateIteratorChain:
     def min(self, default=None):
         return min(self._iterator, default=default)
 
-    def sum(self):
-        pass
+    def sum(self, default=None):
+        try:
+            total = sum(self._iterator)
+        except TypeError as error:
+            if default is None:
+                raise error
+            else:
+                total = default
+        return total
 
     def reduce(self, function):
         return functools.reduce(function, self._iterator)

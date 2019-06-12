@@ -1,4 +1,5 @@
 from iterator_chain.intermediate import _IntermediateIteratorChain
+import pytest
 
 
 # Termination tests
@@ -240,3 +241,42 @@ def test_min_with_default():
 
     assert actual_max == test_default
 
+
+def test_sum():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_max = test_object.sum()
+
+    assert actual_max == sum(test_iterable)
+
+
+def test_sum_with_default_not_used():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_max = test_object.sum('Moof')
+
+    assert actual_max == sum(test_iterable)
+
+
+def test_sum_with_default():
+    test_iterable = ['D', 'o', 'g', 'C', 'o', 'w']
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+    test_default = 'Moof'
+
+    actual_max = test_object.sum(test_default)
+
+    assert actual_max == test_default
+
+
+def test_sum_without_default_but_needed():
+    test_iterable = ['D', 'o', 'g', 'C', 'o', 'w']
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    with pytest.raises(TypeError):
+        test_object.sum()
