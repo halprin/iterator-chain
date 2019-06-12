@@ -133,9 +133,9 @@ def test_none_match_false():
     test_iterator = iter(test_iterable)
     test_object = _IntermediateIteratorChain(test_iterator)
 
-    actual_match = test_object.none_match(lambda item: item == test_value)
+    actual_none_match = test_object.none_match(lambda item: item == test_value)
 
-    assert actual_match == (test_value not in test_iterable)
+    assert actual_none_match == (test_value not in test_iterable)
 
 
 def test_none_match_true():
@@ -144,7 +144,26 @@ def test_none_match_true():
     test_object = _IntermediateIteratorChain(test_iterator)
 
     test_value = 26
-    actual_match = test_object.none_match(lambda item: item == test_value)
+    actual_none_match = test_object.none_match(lambda item: item == test_value)
 
-    assert actual_match == (test_value not in test_iterable)
+    assert actual_none_match == (test_value not in test_iterable)
 
+
+def test_all_match_true():
+    test_iterable = [4, 3, 8, 5, 1]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_match = test_object.all_match(lambda item: item < 26)
+
+    assert actual_match is True
+
+
+def test_all_match_false():
+    test_iterable = [4, 3, 27, 5, 1]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_match = test_object.all_match(lambda item: item < 26)
+
+    assert actual_match is False
