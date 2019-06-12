@@ -55,8 +55,8 @@ class _IntermediateIteratorChain:
     def last(self, default=None):
         pass
 
-    def max(self):
-        pass
+    def max(self, default=None):
+        return max(self._iterator, default=default)
 
     def min(self):
         pass

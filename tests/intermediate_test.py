@@ -177,3 +177,34 @@ def test_count():
     actual_count = test_object.count()
 
     assert actual_count == len(test_iterable)
+
+
+def test_max():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_max = test_object.max()
+
+    assert actual_max == max(test_iterable)
+
+
+def test_max_with_default_not_used():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_max = test_object.max('Moof')
+
+    assert actual_max == max(test_iterable)
+
+
+def test_max_with_default():
+    test_iterable = []
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+    test_default = 'Moof'
+
+    actual_max = test_object.max(test_default)
+
+    assert actual_max == test_default
