@@ -208,3 +208,35 @@ def test_max_with_default():
     actual_max = test_object.max(test_default)
 
     assert actual_max == test_default
+
+
+def test_min():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_max = test_object.min()
+
+    assert actual_max == min(test_iterable)
+
+
+def test_min_with_default_not_used():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_max = test_object.min('Moof')
+
+    assert actual_max == min(test_iterable)
+
+
+def test_min_with_default():
+    test_iterable = []
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+    test_default = 'Moof'
+
+    actual_max = test_object.min(test_default)
+
+    assert actual_max == test_default
+
