@@ -1,8 +1,6 @@
 from iterator_chain.intermediate import _IntermediateIteratorChain
-import pytest
 
 
-# Termination tests
 def test_list():
     test_iterable = [4, 3, 8, 5, 1]
     test_iterator = iter(test_iterable)
@@ -44,7 +42,6 @@ def test_first_with_default():
     assert actual_first == test_default
 
 
-# Chain tests
 def test_map():
     test_iterable = [4, 3, 8, 5, 1]
     test_iterator = iter(test_iterable)
@@ -314,3 +311,13 @@ def test_for_each():
     test_object.for_each(test_lambda)
 
     assert test_call == test_iterable
+
+
+def test_reverse():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_reverse = test_object.reverse().list()
+
+    assert actual_reverse == list(reversed(test_iterable))

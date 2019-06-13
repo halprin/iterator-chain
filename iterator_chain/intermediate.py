@@ -41,7 +41,9 @@ class _IntermediateIteratorChain:
         pass
 
     def reverse(self):
-        pass
+        forward = list(self._iterator)
+        iterator = reversed(forward)
+        return _IntermediateIteratorChain(iterator)
 
     # Termination methods
     def list(self):
