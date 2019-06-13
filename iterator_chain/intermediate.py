@@ -69,11 +69,8 @@ class _IntermediateIteratorChain:
     def sum(self, default=None):
         try:
             total = sum(self._iterator)
-        except TypeError as error:
-            if default is None:
-                raise error
-            else:
-                total = default
+        except TypeError:
+            total = default
         return total
 
     def reduce(self, function):

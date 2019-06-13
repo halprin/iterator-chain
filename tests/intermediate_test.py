@@ -273,15 +273,6 @@ def test_sum_with_default():
     assert actual_sum == test_default
 
 
-def test_sum_without_default_but_needed():
-    test_iterable = ['D', 'o', 'g', 'C', 'o', 'w']
-    test_iterator = iter(test_iterable)
-    test_object = _IntermediateIteratorChain(test_iterator)
-
-    with pytest.raises(TypeError):
-        test_object.sum()
-
-
 def test_last():
     test_iterable = [4, 3, 8, 5, 6]
     test_iterator = iter(test_iterable)
