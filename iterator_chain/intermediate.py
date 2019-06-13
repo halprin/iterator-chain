@@ -81,18 +81,10 @@ class _IntermediateIteratorChain:
             function(item)
 
     def all_match(self, function):
-        for item in self._iterator:
-            item_matches = function(item)
-            if not item_matches:
-                return False
-        return True
+        return all(map(function, self._iterator))
 
     def any_match(self, function):
-        for item in self._iterator:
-            item_matches = function(item)
-            if item_matches:
-                return True
-        return False
+        return any(map(function, self._iterator))
 
     def none_match(self, function):
         return not self.any_match(function)
