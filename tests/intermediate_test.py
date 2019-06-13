@@ -216,9 +216,9 @@ def test_min():
     test_iterator = iter(test_iterable)
     test_object = _IntermediateIteratorChain(test_iterator)
 
-    actual_max = test_object.min()
+    actual_min = test_object.min()
 
-    assert actual_max == min(test_iterable)
+    assert actual_min == min(test_iterable)
 
 
 def test_min_with_default_not_used():
@@ -226,9 +226,9 @@ def test_min_with_default_not_used():
     test_iterator = iter(test_iterable)
     test_object = _IntermediateIteratorChain(test_iterator)
 
-    actual_max = test_object.min('Moof')
+    actual_min = test_object.min('Moof')
 
-    assert actual_max == min(test_iterable)
+    assert actual_min == min(test_iterable)
 
 
 def test_min_with_default():
@@ -237,9 +237,9 @@ def test_min_with_default():
     test_object = _IntermediateIteratorChain(test_iterator)
     test_default = 'Moof'
 
-    actual_max = test_object.min(test_default)
+    actual_min = test_object.min(test_default)
 
-    assert actual_max == test_default
+    assert actual_min == test_default
 
 
 def test_sum():
@@ -247,9 +247,9 @@ def test_sum():
     test_iterator = iter(test_iterable)
     test_object = _IntermediateIteratorChain(test_iterator)
 
-    actual_max = test_object.sum()
+    actual_sum = test_object.sum()
 
-    assert actual_max == sum(test_iterable)
+    assert actual_sum == sum(test_iterable)
 
 
 def test_sum_with_default_not_used():
@@ -257,9 +257,9 @@ def test_sum_with_default_not_used():
     test_iterator = iter(test_iterable)
     test_object = _IntermediateIteratorChain(test_iterator)
 
-    actual_max = test_object.sum('Moof')
+    actual_sum = test_object.sum('Moof')
 
-    assert actual_max == sum(test_iterable)
+    assert actual_sum == sum(test_iterable)
 
 
 def test_sum_with_default():
@@ -268,9 +268,9 @@ def test_sum_with_default():
     test_object = _IntermediateIteratorChain(test_iterator)
     test_default = 'Moof'
 
-    actual_max = test_object.sum(test_default)
+    actual_sum = test_object.sum(test_default)
 
-    assert actual_max == test_default
+    assert actual_sum == test_default
 
 
 def test_sum_without_default_but_needed():
@@ -280,3 +280,34 @@ def test_sum_without_default_but_needed():
 
     with pytest.raises(TypeError):
         test_object.sum()
+
+
+def test_last():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_last = test_object.last()
+
+    assert actual_last == test_iterable[-1]
+
+
+def test_last_with_default_not_used():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_last = test_object.last('Moof')
+
+    assert actual_last == test_iterable[-1]
+
+
+def test_last_with_default():
+    test_iterable = []
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+    test_default = 'Moof'
+
+    actual_last = test_object.last(test_default)
+
+    assert actual_last == test_default

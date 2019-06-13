@@ -1,5 +1,6 @@
 import itertools
 import functools
+import collections
 
 
 class _IntermediateIteratorChain:
@@ -53,7 +54,11 @@ class _IntermediateIteratorChain:
         return next(itertools.islice(self._iterator, 1), default)
 
     def last(self, default=None):
-        pass
+        try:
+            end = collections.deque(self._iterator, maxlen=1).pop()
+        except IndexError:
+            end = default
+        return end
 
     def max(self, default=None):
         return max(self._iterator, default=default)
