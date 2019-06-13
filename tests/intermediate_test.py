@@ -302,3 +302,15 @@ def test_last_with_default():
     actual_last = test_object.last(test_default)
 
     assert actual_last == test_default
+
+
+def test_for_each():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+    test_call = []
+    test_lambda = lambda item: test_call.append(item)
+
+    test_object.for_each(test_lambda)
+
+    assert test_call == test_iterable

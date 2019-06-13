@@ -77,7 +77,8 @@ class _IntermediateIteratorChain:
         return functools.reduce(function, self._iterator)
 
     def for_each(self, function):
-        pass
+        for item in self._iterator:
+            function(item)
 
     def all_match(self, function):
         for item in self._iterator:
