@@ -372,3 +372,13 @@ def test_sort_with_cmp():
     actual_sort = test_object.sort(cmp=_test_cmp).list()
 
     assert actual_sort == sorted(test_iterable, key=test_key)
+
+
+def test_flatten():
+    test_iterable = [[4, 3], 'DogCow', 5, {'dogCow': 'Moof', 'meep': 'moop'}]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_flatten = test_object.flatten().list()
+
+    assert actual_flatten == [4, 3, 'DogCow', 5, ('dogCow', 'Moof'), ('meep', 'moop')]

@@ -34,8 +34,28 @@ class _IntermediateIteratorChain:
         iterator = itertools.islice(self._iterator, max_size)
         return _IntermediateIteratorChain(iterator)
 
+    @staticmethod
+    def _is_dict(something):
+        return isinstance(something, dict)
+
+    @staticmethod
+    def _is_iterable(something):
+        return not isinstance(something, str) and not isinstance(something, dict) and isinstance(something, collections.abc.Iterable)
+
+    def _flatten(self, iterable, force_stop=False):
+        for item in iterable:
+            if force_stop:
+                yield item
+            elif self._is_dict(item):
+                yield from self._flatten(item.items(), force_stop=True)
+            elif self._is_iterable(item):
+                yield from self._flatten(item)
+            else:
+                yield item
+
     def flatten(self):
-        pass
+        iterator = self._flatten(self._iterator)
+        return _IntermediateIteratorChain(iterator)
 
     def sort(self, key=None, cmp=None, reverse=False):
         if key is None and cmp is not None:
