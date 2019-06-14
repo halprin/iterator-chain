@@ -37,8 +37,11 @@ class _IntermediateIteratorChain:
     def flatten(self):
         pass
 
-    def sort(self):
-        pass
+    def sort(self, key=None, cmp=None, reverse=False):
+        if key is None and cmp is not None:
+            key = functools.cmp_to_key(cmp)
+        iterator = iter(sorted(self._iterator, key=key, reverse=reverse))
+        return _IntermediateIteratorChain(iterator)
 
     def reverse(self):
         forward = list(self._iterator)

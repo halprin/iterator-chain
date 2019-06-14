@@ -321,3 +321,54 @@ def test_reverse():
     actual_reverse = test_object.reverse().list()
 
     assert actual_reverse == list(reversed(test_iterable))
+
+
+def test_sort():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_sort = test_object.sort().list()
+
+    assert actual_sort == sorted(test_iterable)
+
+
+def test_sort_reverse():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+
+    actual_sort = test_object.sort(reverse=True).list()
+
+    assert actual_sort == sorted(test_iterable, reverse=True)
+
+
+def test_sort_with_key():
+    test_iterable = [{'inner': 8}, {'inner': 2}, {'inner': 6}, {'inner': 3}, {'inner': 9}]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+    test_key = lambda item: item['inner']
+
+    actual_sort = test_object.sort(key=test_key).list()
+
+    assert actual_sort == sorted(test_iterable, key=test_key)
+
+
+def _test_cmp(first, second):
+    if first['inner'] > second['inner']:
+        return 1
+    elif first['inner'] == second['inner']:
+        return 0
+    else:
+        return -1
+
+
+def test_sort_with_cmp():
+    test_iterable = [{'inner': 8}, {'inner': 2}, {'inner': 6}, {'inner': 3}, {'inner': 9}]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateIteratorChain(test_iterator)
+    test_key = lambda item: item['inner']
+
+    actual_sort = test_object.sort(cmp=_test_cmp).list()
+
+    assert actual_sort == sorted(test_iterable, key=test_key)
