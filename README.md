@@ -63,14 +63,14 @@ an actual value.  This value will depend on all the previous chaining methods be
 | `distinct` |  | Any duplicates will be removed. |
 | `limit` | • `max_size` - An integer | The iterator will stop after `max_size` elements.  Any elements afterward are effectively removed. |
 | `flatten` |  | Any element that is an iterable itself will have its elements iterated over first before continuing with the remaining elements.  Strings (`str`) do not count as an iterable for this method.  Dictionaries flatten to its item tuples. |
-| `sort` | • `key` - Keyword.  A function of one argument that is used to extract a comparison key from each element<br/>• `cmp` - Keyword.  A Python 2.x "cmp" function that takes two arguments<br/>• `reverse` - Keyword.  If set to `True`, the elements will be sorted in the reverse order. | Sorts the iterator based on the elements' values.  Use `key` or `cmp` to make a custom comparison.  If `key` is specified, `cmp` cannot be used.  This method is expensive because it must serialize all the values into a sequence. |
+| `sort` | • `key` - Keyword.  A function of one argument that is used to extract a comparison key from each element<br/>• `cmp` - Keyword.  A Python 2.x "cmp" function that takes two arguments<br/>• `reverse` - Keyword.  If set to `True`, the elements will be sorted in the reverse order | Sorts the iterator based on the elements' values.  Use `key` or `cmp` to make a custom comparison.  If `key` is specified, `cmp` cannot be used.  This method is expensive because it must serialize all the values into a sequence. |
 | `reverse` |  | Reverses the iterator.  The last time will be first, and the first item will be last.  This method is expensive because it must serialize all the values into a list. |
 
 #### Terminating methods
 | Method | Arguments | Description | 
 | --- | --- | --- |
 | `list` |  | Serializes the iterator chain into a `list` and returns it. |
-| `count` |  | Returns the number of elements in the iterator |
+| `count` |  | Returns the number of elements in the iterator. |
 | `first` | • `default` - Keyword.  Any value. | Returns just the first item in the iterator.  If the iterator is empty, the `default` is returned. |
 | `last` | • `default` - Keyword.  Any value. | Returns just the last item in the iterator.  If the iterator is empty, the `default` is returned. |
 | `max` | • `default` - Keyword.  Any value. | Returns the largest valued element in the iterator.  If the iterator is empty, the `default` is returned. |

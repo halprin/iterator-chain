@@ -4,6 +4,12 @@ from iterator_chain.parallel_itermediate import _IntermediateParallelIteratorCha
 
 
 def from_iterable(iterable):
+    """
+    Starts the iterator chain with the supplied iterable.  Chaining and terminating methods can now be called on the result.
+
+    :param iterable: An iterable to be used in the iterator chain.
+    :return: An intermediate object that subsequent chaining and terminating methods can be called on.
+    """
     iterator = iter(iterable)
     return _IntermediateIteratorChain(iterator)
 
