@@ -1,6 +1,24 @@
 # iterator-chain
 Chain together lazily computed modifications to iterators.
 
+One normally needs to do the following
+```python
+list(map(lambda element: element / 3,
+filter(lambda element: element > 32,
+map(lambda element: element * 2, [5, 78, 12, 26]))))
+```
+
+Instead do this
+```python
+iterator_chain.from_iterable([5, 78, 12, 26]) \
+.map(lambda element: element * 2) \
+.filter(lambda element: element > 32) \
+.map(lambda element: element / 3).list()
+```
+
+It allows the developer to read the code in a more natural fashion: from left to right and from top to bottom.  The
+developer no longer needs to "unwrap" the functions to understand the logic.
+
 ## Install
 Include `iterator-chain` in your `requirements.txt` file and/or use `pip` to install it.
 ```bash
