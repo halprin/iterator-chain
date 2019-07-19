@@ -18,6 +18,16 @@ class _IntermediateIteratorChain:
         iterator = map(function, self._iterator)
         return _IntermediateIteratorChain(iterator)
 
+    def filter(self, function):
+        """
+        Will run the `function` on every element.  `function` should return a truthy or falsy value.  On true, the element will stay; on false, the element will be removed.
+
+        :param function: A function that takes a single argument.
+        :return: An intermediate object that subsequent chaining and terminating methods can be called on.
+        """
+        iterator = filter(function, self._iterator)
+        return _IntermediateIteratorChain(iterator)
+
     def skip(self, number):
         """
         The `number` number of elements will be skipped over and effectively removed.
@@ -26,16 +36,6 @@ class _IntermediateIteratorChain:
         :return: An intermediate object that subsequent chaining and terminating methods can be called on.
         """
         iterator = itertools.islice(self._iterator, number, None)
-        return _IntermediateIteratorChain(iterator)
-
-    def filter(self, function):
-        """
-        Will run the `function` on every element.  `function` should return a truthy or falsy value.  On true, the element will stay; on false, the element will be removed.
-
-        :param function: A function that takes a single argument
-        :return: An intermediate object that subsequent chaining and terminating methods can be called on.
-        """
-        iterator = filter(function, self._iterator)
         return _IntermediateIteratorChain(iterator)
 
     def distinct(self):

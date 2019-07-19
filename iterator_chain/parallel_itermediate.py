@@ -13,13 +13,27 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
 
     # Chain methods
     def map(self, function, chunksize=None):
+        """
+        Will run the `function` across all the elements in the iterator in parallel.
+
+        :param function: A function that takes a single argument.
+        :param chunksize: How big of chunks to split the iterator up across the parallel execution units.  If unspecified or None, the chunk size will start at 1 and send that many elements to each execution unit.  The chunk size will then increment in powers of two and send that many items to each execution unit.  This is repeated until the iterator is exhausted.
+        :return: An intermediate object that subsequent chaining and terminating methods can be called on.
+        """
         chunksize = chunksize or self._chunksize
 
         iterator_of_results = _ParallelExecutionIterator(self._iterator, function, self._executor, chunksize=chunksize)
 
-        return _IntermediateParallelIteratorChain(iterator_of_results, self._executor)
+        return _IntermediateParallelIteratorChain(iterator_of_results, self._executor, chunksize=self._chunksize)
 
     def filter(self, function, chunksize=None):
+        """
+        Will run the `function` on every element in parallel.  `function` should return a truthy or falsy value.  On true, the element will stay; on false, the element will be removed.
+
+        :param function: A function that takes a single argument.
+        :param chunksize: How big of chunks to split the iterator up across the parallel execution units.  If unspecified or None, the chunk size will start at 1 and send that many elements to each execution unit.  The chunk size will then increment in powers of two and send that many items to each execution unit.  This is repeated until the iterator is exhausted.
+        :return: An intermediate object that subsequent chaining and terminating methods can be called on.
+        """
         chunksize = chunksize or self._chunksize
 
         partial_filter_helper = functools.partial(self._filter_helper, function)
@@ -27,7 +41,7 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
         filtered_results_iterator = filter(lambda item_tuple: item_tuple[1], iterator_of_results)
         filtered_original_item_iterator = map(lambda item_tuple: item_tuple[0], filtered_results_iterator)
 
-        return _IntermediateParallelIteratorChain(filtered_original_item_iterator, self._executor)
+        return _IntermediateParallelIteratorChain(filtered_original_item_iterator, self._executor, chunksize=self._chunksize)
 
     @staticmethod
     def _filter_helper(function, item):
@@ -100,7 +114,7 @@ class _ParallelExecutionIterator(collections.abc.Iterator):
         iterator is exhausted.
 
         :param executor: The executor to use
-        :param function: The function to execute against every item in the iterator
+        :param function: The function to execute against every item in the iterator.
         :param input_iterator: The iterator to run the function against.
         :return: An iterator who's values have been transformed by the function.
         """
@@ -110,8 +124,10 @@ class _ParallelExecutionIterator(collections.abc.Iterator):
 
         for chunksize in cls._power_of_two_range(1):
             miniature_input_iterator = itertools.islice(input_iterator, chunksize * cpu_count)
-            if cls._iterator_is_empty([miniature_input_iterator]):
+            list_of_miniature_input_iterator = [miniature_input_iterator]
+            if cls._iterator_is_empty(list_of_miniature_input_iterator):
                 break
+            miniature_input_iterator = list_of_miniature_input_iterator[0]
             miniature_output_iterator = executor.map(function, miniature_input_iterator, chunksize=chunksize)
             constructed_output_iterator = itertools.chain(constructed_output_iterator, miniature_output_iterator)
 
