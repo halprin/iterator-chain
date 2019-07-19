@@ -23,6 +23,7 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
         super(_IntermediateParallelIteratorChain, self).__init__(iterator)
         self._executor = executor
         self._chunksize = chunksize
+        self._chain_method_called = False
 
     # Chain methods
     @shutdown_executor_on_exception
@@ -35,6 +36,7 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
         :return: An intermediate object that subsequent chaining and terminating methods can be called on.
         """
         chunksize = chunksize or self._chunksize
+        self._chain_method_called = True
 
         iterator_of_results = _ParallelExecutionIterator(self._iterator, function, self._executor, chunksize=chunksize)
 
@@ -50,6 +52,7 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
         :return: An intermediate object that subsequent chaining and terminating methods can be called on.
         """
         chunksize = chunksize or self._chunksize
+        self._chain_method_called = True
 
         partial_filter_helper = functools.partial(self._filter_helper, function)
         iterator_of_results = _ParallelExecutionIterator(self._iterator, partial_filter_helper, self._executor, chunksize=chunksize)
@@ -67,26 +70,27 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
     @shutdown_executor_on_exception
     def list(self):
         serialized = super(_IntermediateParallelIteratorChain, self).list()
-        self._executor.shutdown(wait=True)
         return serialized
 
     @shutdown_executor_on_exception
     def count(self):
         count = super(_IntermediateParallelIteratorChain, self).count()
-        self._executor.shutdown(wait=True)
         return count
 
     @shutdown_executor_on_exception
     def first(self, default=None):
         first = super(_IntermediateParallelIteratorChain, self).first(default)
-        self._executor.shutdown(wait=True)
         return first
 
     @shutdown_executor_on_exception
     def last(self, default=None):
         last = super(_IntermediateParallelIteratorChain, self).last(default)
-        self._executor.shutdown(wait=True)
         return last
+
+    def __del__(self):
+        if not self._chain_method_called:
+            # we were the last chain method, we are in charge of shutting down the executor
+            self._executor.shutdown(wait=True)
 
 
 class _ParallelExecutionIterator(collections.abc.Iterator):
