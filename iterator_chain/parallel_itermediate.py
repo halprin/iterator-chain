@@ -3,6 +3,19 @@ from iterator_chain.intermediate import _IntermediateIteratorChain
 import collections
 import os
 import itertools
+from functools import wraps
+
+
+def shutdown_executor_on_exception(original_function):
+    @wraps(original_function)
+    def wrapper(self, *args, **kwargs):
+        try:
+            return original_function(self, *args, **kwargs)
+        except Exception as exception:
+            self._executor.shutdown(wait=True)
+            raise exception
+
+    return wrapper
 
 
 class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
@@ -12,6 +25,7 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
         self._chunksize = chunksize
 
     # Chain methods
+    @shutdown_executor_on_exception
     def map(self, function, chunksize=None):
         """
         Will run the `function` across all the elements in the iterator in parallel.
@@ -26,6 +40,7 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
 
         return _IntermediateParallelIteratorChain(iterator_of_results, self._executor, chunksize=self._chunksize)
 
+    @shutdown_executor_on_exception
     def filter(self, function, chunksize=None):
         """
         Will run the `function` on every element in parallel.  `function` should return a truthy or falsy value.  On true, the element will stay; on false, the element will be removed.
@@ -49,21 +64,25 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
         return item, true_or_false
 
     # Termination methods
+    @shutdown_executor_on_exception
     def list(self):
         serialized = super(_IntermediateParallelIteratorChain, self).list()
         self._executor.shutdown(wait=True)
         return serialized
 
+    @shutdown_executor_on_exception
     def count(self):
         count = super(_IntermediateParallelIteratorChain, self).count()
         self._executor.shutdown(wait=True)
         return count
 
+    @shutdown_executor_on_exception
     def first(self, default=None):
         first = super(_IntermediateParallelIteratorChain, self).first(default)
         self._executor.shutdown(wait=True)
         return first
 
+    @shutdown_executor_on_exception
     def last(self, default=None):
         last = super(_IntermediateParallelIteratorChain, self).last(default)
         self._executor.shutdown(wait=True)
@@ -160,4 +179,3 @@ class _ParallelExecutionIterator(collections.abc.Iterator):
             return False
         except StopIteration:
             return True
-
