@@ -1,6 +1,6 @@
 from concurrent.futures import ProcessPoolExecutor
 from iterator_chain.intermediate import _IntermediateIteratorChain
-from iterator_chain.parallel_itermediate import _IntermediateParallelIteratorChain
+from iterator_chain.parallel_intermediate import _IntermediateParallelIteratorChain
 
 
 def from_iterable(iterable):
