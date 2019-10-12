@@ -35,8 +35,11 @@ class _IntermediateIteratorChain:
         :param number: An integer.
         :return: An intermediate object that subsequent chaining and terminating methods can be called on.
         """
-        iterator = itertools.islice(self._iterator, number, None)
+        iterator = self._skip(number)
         return _IntermediateIteratorChain(iterator)
+
+    def _skip(self, number):
+        return itertools.islice(self._iterator, number, None)
 
     def distinct(self):
         """
@@ -60,8 +63,11 @@ class _IntermediateIteratorChain:
         :param max_size: An integer.
         :return: An intermediate object that subsequent chaining and terminating methods can be called on.
         """
-        iterator = itertools.islice(self._iterator, max_size)
+        iterator = self._limit(max_size)
         return _IntermediateIteratorChain(iterator)
+
+    def _limit(self, max_size):
+        return itertools.islice(self._iterator, max_size)
 
     @staticmethod
     def _is_dict(something):
@@ -100,20 +106,26 @@ class _IntermediateIteratorChain:
         :param reverse: Keyword.  If set to `True`, the elements will be sorted in the reverse order.
         :return: An intermediate object that subsequent chaining and terminating methods can be called on.
         """
+        iterator = self._sort(key=key, cmp=cmp, reverse=reverse)
+        return _IntermediateIteratorChain(iterator)
+
+    def _sort(self, key=None, cmp=None, reverse=False):
         if key is None and cmp is not None:
             key = functools.cmp_to_key(cmp)
-        iterator = iter(sorted(self._iterator, key=key, reverse=reverse))
-        return _IntermediateIteratorChain(iterator)
+        return iter(sorted(self._iterator, key=key, reverse=reverse))
 
     def reverse(self):
         """
-        Reverses the iterator.  The last time will be first, and the first item will be last.  This method is expensive because it must serialize all the values into a list.
+        Reverses the iterator.  The last item will be first, and the first item will be last.  This method is expensive because it must serialize all the values into a list.
 
         :return: An intermediate object that subsequent chaining and terminating methods can be called on.
         """
-        forward = list(self._iterator)
-        iterator = reversed(forward)
+        iterator = self._reverse()
         return _IntermediateIteratorChain(iterator)
+
+    def _reverse(self):
+        forward = list(self._iterator)
+        return reversed(forward)
 
     # Termination methods
     def list(self):

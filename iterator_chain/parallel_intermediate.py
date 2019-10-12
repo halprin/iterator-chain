@@ -66,6 +66,36 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
         true_or_false = function(item)
         return item, true_or_false
 
+    @shutdown_executor_on_exception
+    def skip(self, number):
+        iterator = self._skip(number)
+        return _IntermediateParallelIteratorChain(iterator, self._executor, chunksize=self._chunksize)
+
+    @shutdown_executor_on_exception
+    def distinct(self):
+        iterator = self._distinct()
+        return _IntermediateParallelIteratorChain(iterator, self._executor, chunksize=self._chunksize)
+
+    @shutdown_executor_on_exception
+    def limit(self, max_size):
+        iterator = self._limit(max_size)
+        return _IntermediateParallelIteratorChain(iterator, self._executor, chunksize=self._chunksize)
+
+    @shutdown_executor_on_exception
+    def flatten(self):
+        iterator = self._flatten(self._iterator)
+        return _IntermediateParallelIteratorChain(iterator, self._executor, chunksize=self._chunksize)
+
+    @shutdown_executor_on_exception
+    def sort(self, key=None, cmp=None, reverse=False):
+        iterator = self._sort(key=key, cmp=cmp, reverse=reverse)
+        return _IntermediateParallelIteratorChain(iterator, self._executor, chunksize=self._chunksize)
+
+    @shutdown_executor_on_exception
+    def reverse(self):
+        iterator = self._reverse()
+        return _IntermediateParallelIteratorChain(iterator, self._executor, chunksize=self._chunksize)
+
     # Termination methods
     @shutdown_executor_on_exception
     def list(self):
@@ -86,6 +116,46 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
     def last(self, default=None):
         last = super(_IntermediateParallelIteratorChain, self).last(default)
         return last
+
+    @shutdown_executor_on_exception
+    def max(self, default=None):
+        max = super(_IntermediateParallelIteratorChain, self).max(default)
+        return max
+
+    @shutdown_executor_on_exception
+    def min(self, default=None):
+        min = super(_IntermediateParallelIteratorChain, self).min(default)
+        return min
+
+    @shutdown_executor_on_exception
+    def sum(self, default=None):
+        sum = super(_IntermediateParallelIteratorChain, self).sum(default)
+        return sum
+
+    @shutdown_executor_on_exception
+    def reduce(self, function):
+        reduce = super(_IntermediateParallelIteratorChain, self).reduce(function)
+        return reduce
+
+    @shutdown_executor_on_exception
+    def for_each(self, function):
+        # TODO: implement in a parallel fashion
+        pass
+
+    @shutdown_executor_on_exception
+    def all_match(self, function):
+        all_match = super(_IntermediateParallelIteratorChain, self).all_match(function)
+        return all_match
+
+    @shutdown_executor_on_exception
+    def any_match(self, function):
+        any_match = super(_IntermediateParallelIteratorChain, self).any_match(function)
+        return any_match
+
+    @shutdown_executor_on_exception
+    def none_match(self, function):
+        none_match = super(_IntermediateParallelIteratorChain, self).none_match(function)
+        return none_match
 
     def __del__(self):
         if not self._chain_method_called:

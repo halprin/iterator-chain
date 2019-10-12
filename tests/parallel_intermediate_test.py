@@ -1,6 +1,8 @@
 from concurrent.futures import Executor
 from concurrent.futures import Future
+import inspect
 from iterator_chain.parallel_intermediate import _IntermediateParallelIteratorChain
+from iterator_chain.intermediate import _IntermediateIteratorChain
 
 
 class SerialExecutor(Executor):
@@ -25,6 +27,20 @@ class SerialExecutor(Executor):
     def shutdown(self, wait=True):
         self.shutdown_called = True
         super(SerialExecutor, self).shutdown(wait=wait)
+
+
+# Ensure that all public methods of _IntermediateIteratorChain are overloaded by _IntermediateParallelIteratorChain and are decorated by @shutdown_executor_on_exception
+def test_correct_overloading():
+    parent_class_methods = {method[0]: method[1] for method in inspect.getmembers(_IntermediateIteratorChain, predicate=inspect.isfunction)}
+    class_methods = {method[0]: method[1] for method in inspect.getmembers(_IntermediateParallelIteratorChain, predicate=inspect.isfunction)}
+
+    for parent_method_name in parent_class_methods:
+        if parent_method_name[0] == '_':
+            continue
+        if class_methods.get(parent_method_name, None) is None:
+            raise Exception('{} is not inherited by _IntermediateParallelIteratorChain'.format(parent_method_name))
+        elif class_methods[parent_method_name] == parent_class_methods[parent_method_name]:
+            raise Exception('{} is not overloaded by _IntermediateParallelIteratorChain'.format(parent_method_name))
 
 
 # Parallel tests
@@ -79,6 +95,29 @@ def test_filter():
     test_lambda = lambda item: item > 4
 
     new_intermediate = test_object.filter(test_lambda)
+
+    assert new_intermediate.list() == list(filter(test_lambda, [4, 3, 8, 5, 1]))
+
+
+# Test chunk size
+def test_filter_with_specified_chunksize():
+    test_iterable = [4, 3, 8, 5, 1]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateParallelIteratorChain(test_iterator, SerialExecutor(), chunksize=2)
+    test_lambda = lambda item: item > 4
+
+    new_intermediate = test_object.filter(test_lambda)
+
+    assert new_intermediate.list() == list(filter(test_lambda, [4, 3, 8, 5, 1]))
+
+
+def test_filter_with_specified_chunksize_on_specific_method():
+    test_iterable = [4, 3, 8, 5, 1]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateParallelIteratorChain(test_iterator, SerialExecutor())
+    test_lambda = lambda item: item > 4
+
+    new_intermediate = test_object.filter(test_lambda, chunksize=2)
 
     assert new_intermediate.list() == list(filter(test_lambda, [4, 3, 8, 5, 1]))
 
