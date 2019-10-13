@@ -68,31 +68,37 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
 
     @shutdown_executor_on_exception
     def skip(self, number):
+        self._chain_method_called = True
         iterator = self._skip(number)
         return _IntermediateParallelIteratorChain(iterator, self._executor, chunksize=self._chunksize)
 
     @shutdown_executor_on_exception
     def distinct(self):
+        self._chain_method_called = True
         iterator = self._distinct()
         return _IntermediateParallelIteratorChain(iterator, self._executor, chunksize=self._chunksize)
 
     @shutdown_executor_on_exception
     def limit(self, max_size):
+        self._chain_method_called = True
         iterator = self._limit(max_size)
         return _IntermediateParallelIteratorChain(iterator, self._executor, chunksize=self._chunksize)
 
     @shutdown_executor_on_exception
     def flatten(self):
+        self._chain_method_called = True
         iterator = self._flatten(self._iterator)
         return _IntermediateParallelIteratorChain(iterator, self._executor, chunksize=self._chunksize)
 
     @shutdown_executor_on_exception
     def sort(self, key=None, cmp=None, reverse=False):
+        self._chain_method_called = True
         iterator = self._sort(key=key, cmp=cmp, reverse=reverse)
         return _IntermediateParallelIteratorChain(iterator, self._executor, chunksize=self._chunksize)
 
     @shutdown_executor_on_exception
     def reverse(self):
+        self._chain_method_called = True
         iterator = self._reverse()
         return _IntermediateParallelIteratorChain(iterator, self._executor, chunksize=self._chunksize)
 
@@ -138,9 +144,17 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
         return reduce
 
     @shutdown_executor_on_exception
-    def for_each(self, function):
-        # TODO: implement in a parallel fashion
-        pass
+    def for_each(self, function, chunksize=None):
+        """
+        Executes `function` on every element in the iterator in parallel.  There is no return value.  If you are wanting to return a list of values based on the function, use `.map(function).list()`.
+
+        :param function: A function that takes one argument and returns nothing.
+        :param chunksize: How big of chunks to split the iterator up across the parallel execution units.  If unspecified or None, the chunk size will start at 1 and send that many elements to each execution unit.  The chunk size will then increment in powers of two and send that many items to each execution unit.  This is repeated until the iterator is exhausted.
+        """
+        chunksize = chunksize or self._chunksize
+
+        iterator_of_results = _ParallelExecutionIterator(self._iterator, function, self._executor, chunksize=chunksize)
+        list(iterator_of_results)
 
     @shutdown_executor_on_exception
     def all_match(self, function):

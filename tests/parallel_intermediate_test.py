@@ -14,7 +14,6 @@ class SerialExecutor(Executor):
 
         try:
             submit_result = fn(*args, **kwargs)
-            print(submit_result)
             submit_future.set_result(submit_result)
         except Exception as exception:
             submit_future.set_exception(exception)
@@ -29,7 +28,7 @@ class SerialExecutor(Executor):
         super(SerialExecutor, self).shutdown(wait=wait)
 
 
-# Ensure that all public methods of _IntermediateIteratorChain are overloaded by _IntermediateParallelIteratorChain and are decorated by @shutdown_executor_on_exception
+# Ensure that all public methods of _IntermediateIteratorChain are overloaded by _IntermediateParallelIteratorChain
 def test_correct_overloading():
     parent_class_methods = {method[0]: method[1] for method in inspect.getmembers(_IntermediateIteratorChain, predicate=inspect.isfunction)}
     class_methods = {method[0]: method[1] for method in inspect.getmembers(_IntermediateParallelIteratorChain, predicate=inspect.isfunction)}
@@ -99,8 +98,22 @@ def test_filter():
     assert new_intermediate.list() == list(filter(test_lambda, [4, 3, 8, 5, 1]))
 
 
+def test_for_each():
+    test_iterable = [4, 3, 8, 5, 1]
+    test_iterator = iter(test_iterable)
+    test_object = _IntermediateParallelIteratorChain(test_iterator, SerialExecutor())
+    test_parallel_output = []
+
+    def function_test(item):
+        test_parallel_output.append(item)
+
+    test_object.for_each(function_test)
+
+    assert test_parallel_output == test_iterable
+
+
 # Test chunk size
-def test_filter_with_specified_chunksize():
+def test_with_specified_chunksize():
     test_iterable = [4, 3, 8, 5, 1]
     test_iterator = iter(test_iterable)
     test_object = _IntermediateParallelIteratorChain(test_iterator, SerialExecutor(), chunksize=2)
@@ -111,7 +124,7 @@ def test_filter_with_specified_chunksize():
     assert new_intermediate.list() == list(filter(test_lambda, [4, 3, 8, 5, 1]))
 
 
-def test_filter_with_specified_chunksize_on_specific_method():
+def test_with_specified_chunksize_on_specific_method():
     test_iterable = [4, 3, 8, 5, 1]
     test_iterator = iter(test_iterable)
     test_object = _IntermediateParallelIteratorChain(test_iterator, SerialExecutor())
