@@ -139,8 +139,8 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
         return sum
 
     @shutdown_executor_on_exception
-    def reduce(self, function):
-        reduce = super(_IntermediateParallelIteratorChain, self).reduce(function)
+    def reduce(self, function, initial=None):
+        reduce = super(_IntermediateParallelIteratorChain, self).reduce(function, initial=initial)
         return reduce
 
     @shutdown_executor_on_exception

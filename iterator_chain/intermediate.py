@@ -197,14 +197,18 @@ class _IntermediateIteratorChain:
             total = default
         return total
 
-    def reduce(self, function):
+    def reduce(self, function, initial=None):
         """
-        Applies the function to two elements in the iterator cumulatively.  Subsequent calls to `function` uses the previous return value from `function` as the first argument and the next element in the iterator as the second argument.  The final value is returned.
+        Applies the function to two elements in the iterator cumulatively.  Subsequent calls to `function` uses the previous return value from `function` as the first argument and the next element in the iterator as the second argument.  The final value is returned.  If `initial` is present, it is placed before the items of the sequence in the calculation, and serves as a default when the sequence is empty.
 
         :param function: A function that takes two arguments.
+        :param initial: Keyword.  Any value.
         :return: The final reduced value.
         """
-        return functools.reduce(function, self._iterator)
+        if initial is None:
+            return functools.reduce(function, self._iterator)
+        else:
+            return functools.reduce(function, self._iterator, initial)
 
     def for_each(self, function):
         """
