@@ -76,7 +76,7 @@ def test_executor_shutdowns_when_exception_raised():
     assert executor.shutdown_called is True
 
 
-# Chain methods
+# Chain methods parallel
 def test_map():
     test_iterable = [4, 3, 8, 5, 1]
     test_iterator = iter(test_iterable)
@@ -98,6 +98,135 @@ def test_filter():
     assert new_intermediate.list() == list(filter(test_lambda, [4, 3, 8, 5, 1]))
 
 
+# Chain methods work the same as serial
+def test_skip():
+    test_iterable = [4, 3, 8, 5, 1]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    new_serial_intermediate = test_serial_object.skip(3)
+    new_parallel_intermediate = test_parallel_object.skip(3)
+
+    assert new_parallel_intermediate.list() == new_serial_intermediate.list()
+
+
+def test_distinct():
+    test_iterable = [4, 3, 4, 5, 1, 3, 4]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    new_serial_intermediate = test_serial_object.distinct()
+    new_parallel_intermediate = test_parallel_object.distinct()
+
+    assert new_parallel_intermediate.list() == new_serial_intermediate.list()
+
+
+def test_limit():
+    test_iterable = [4, 3, 8, 5, 1]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    new_serial_intermediate = test_serial_object.limit(3)
+    new_parallel_intermediate = test_parallel_object.limit(3)
+
+    assert new_parallel_intermediate.list() == new_serial_intermediate.list()
+
+
+def test_flatten():
+    test_iterable = [[4, 3], 'DogCow', 5, {'dogCow': 'Moof', 'meep': 'moop'}]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    new_serial_intermediate = test_serial_object.flatten()
+    new_parallel_intermediate = test_parallel_object.flatten()
+
+    assert new_parallel_intermediate.list() == new_serial_intermediate.list()
+
+
+def test_sort():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    new_serial_intermediate = test_serial_object.sort()
+    new_parallel_intermediate = test_parallel_object.sort()
+
+    assert new_parallel_intermediate.list() == new_serial_intermediate.list()
+
+
+def test_sort_reverse():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    new_serial_intermediate = test_serial_object.sort(reverse=True)
+    new_parallel_intermediate = test_parallel_object.sort(reverse=True)
+
+    assert new_parallel_intermediate.list() == new_serial_intermediate.list()
+
+
+def test_sort_with_key():
+    test_iterable = [{'inner': 8}, {'inner': 2}, {'inner': 6}, {'inner': 3}, {'inner': 9}]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+    test_key = lambda item: item['inner']
+
+    new_serial_intermediate = test_serial_object.sort(key=test_key)
+    new_parallel_intermediate = test_parallel_object.sort(key=test_key)
+
+    assert new_parallel_intermediate.list() == new_serial_intermediate.list()
+
+
+def _test_cmp(first, second):
+    if first['inner'] > second['inner']:
+        return 1
+    elif first['inner'] == second['inner']:
+        return 0
+    else:
+        return -1
+
+
+def test_sort_with_cmp():
+    test_iterable = [{'inner': 8}, {'inner': 2}, {'inner': 6}, {'inner': 3}, {'inner': 9}]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    new_serial_intermediate = test_serial_object.sort(cmp=_test_cmp)
+    new_parallel_intermediate = test_parallel_object.sort(cmp=_test_cmp)
+
+    assert new_parallel_intermediate.list() == new_serial_intermediate.list()
+
+
+def test_reverse():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    new_serial_intermediate = test_serial_object.reverse()
+    new_parallel_intermediate = test_parallel_object.reverse()
+
+    assert new_parallel_intermediate.list() == new_serial_intermediate.list()
+
+
+# Terminating methods parallel
 def test_for_each():
     test_iterable = [4, 3, 8, 5, 1]
     test_iterator = iter(test_iterable)
@@ -216,3 +345,236 @@ def test_last_with_default():
     actual_last = test_object.last(test_default)
 
     assert actual_last == test_default
+
+
+def test_max():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    serial_value = test_serial_object.max()
+    parallel_value = test_parallel_object.max()
+
+    assert parallel_value == serial_value
+
+
+def test_max_with_default():
+    test_iterable = []
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+    test_default = 'Moof'
+
+    serial_value = test_serial_object.max(default=test_default)
+    parallel_value = test_parallel_object.max(default=test_default)
+
+    assert parallel_value == serial_value
+
+
+def test_max_default_not_used():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+    test_default = 'Moof'
+
+    serial_value = test_serial_object.max(default=test_default)
+    parallel_value = test_parallel_object.max(default=test_default)
+
+    assert parallel_value == serial_value
+
+
+def test_min():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    serial_value = test_serial_object.min()
+    parallel_value = test_parallel_object.min()
+
+    assert parallel_value == serial_value
+
+
+def test_min_with_default():
+    test_iterable = []
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+    test_default = 'Moof'
+
+    serial_value = test_serial_object.min(default=test_default)
+    parallel_value = test_parallel_object.min(default=test_default)
+
+    assert parallel_value == serial_value
+
+
+def test_min_default_not_used():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+    test_default = 'Moof'
+
+    serial_value = test_serial_object.min(default=test_default)
+    parallel_value = test_parallel_object.min(default=test_default)
+
+    assert parallel_value == serial_value
+
+
+def test_sum():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    serial_value = test_serial_object.sum()
+    parallel_value = test_parallel_object.sum()
+
+    assert parallel_value == serial_value
+
+
+def test_sum_with_default():
+    test_iterable = ['D', 'o', 'g', 'C', 'o', 'w']
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+    test_default = 'Moof'
+
+    serial_value = test_serial_object.sum(default=test_default)
+    parallel_value = test_parallel_object.sum(default=test_default)
+
+    assert parallel_value == serial_value
+
+
+def test_sum_default_not_used():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+    test_default = 'Moof'
+
+    serial_value = test_serial_object.sum(default=test_default)
+    parallel_value = test_parallel_object.sum(default=test_default)
+
+    assert parallel_value == serial_value
+
+
+def test_reduce():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    serial_value = test_serial_object.reduce(lambda first, second: first * second)
+    parallel_value = test_parallel_object.reduce(lambda first, second: first * second)
+
+    assert parallel_value == serial_value
+
+
+def test_reduce_with_initial():
+    test_iterable = [4, 3, 8, 5, 6]
+    test_initial = 26
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    serial_value = test_serial_object.reduce(lambda first, second: first * second, initial=test_initial)
+    parallel_value = test_parallel_object.reduce(lambda first, second: first * second, initial=test_initial)
+
+    assert parallel_value == serial_value
+
+
+def test_all_match_true():
+    test_iterable = [4, 3, 8, 5, 1]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    serial_value = test_serial_object.all_match(lambda item: item < 26)
+    parallel_value = test_parallel_object.all_match(lambda item: item < 26)
+
+    assert parallel_value == serial_value
+
+
+def test_all_match_false():
+    test_iterable = [4, 3, 27, 5, 1]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    serial_value = test_serial_object.all_match(lambda item: item < 26)
+    parallel_value = test_parallel_object.all_match(lambda item: item < 26)
+
+    assert parallel_value == serial_value
+
+
+def test_any_match_true():
+    test_value = 8
+    test_iterable = [4, 3, test_value, 5, 1]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    serial_value = test_serial_object.any_match(lambda item: item == test_value)
+    parallel_value = test_parallel_object.any_match(lambda item: item == test_value)
+
+    assert parallel_value == serial_value
+
+
+def test_any_match_false():
+    test_value = 26
+    test_iterable = [4, 3, 8, 5, 1]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    serial_value = test_serial_object.any_match(lambda item: item == test_value)
+    parallel_value = test_parallel_object.any_match(lambda item: item == test_value)
+
+    assert parallel_value == serial_value
+
+
+def test_none_match_false():
+    test_value = 8
+    test_iterable = [4, 3, test_value, 5, 1]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    serial_value = test_serial_object.none_match(lambda item: item == test_value)
+    parallel_value = test_parallel_object.none_match(lambda item: item == test_value)
+
+    assert parallel_value == serial_value
+
+
+def test_none_match_true():
+    test_value = 26
+    test_iterable = [4, 3, 8, 5, 1]
+    test_serial_iterator = iter(test_iterable)
+    test_parallel_iterator = iter(test_iterable)
+    test_serial_object = _IntermediateIteratorChain(test_serial_iterator)
+    test_parallel_object = _IntermediateParallelIteratorChain(test_parallel_iterator, SerialExecutor())
+
+    serial_value = test_serial_object.none_match(lambda item: item == test_value)
+    parallel_value = test_parallel_object.none_match(lambda item: item == test_value)
+
+    assert parallel_value == serial_value
+
