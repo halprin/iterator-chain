@@ -20,9 +20,6 @@ class SerialExecutor(Executor):
 
         return submit_future
 
-    # def map(self, fn, *iterables, timeout=None, chunksize=1):
-    #     super(SerialExecutor, self).map(fn, *iterables, timeout=timeout, chunksize=chunksize)
-
     def shutdown(self, wait=True):
         self.shutdown_called = True
         super(SerialExecutor, self).shutdown(wait=wait)
