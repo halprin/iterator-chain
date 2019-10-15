@@ -32,15 +32,17 @@ import iterator_chain
 ```
 
 ### Start the chain
-To start the chain, use the `from_iterable` function.  It takes an iterable.
+To start the chain, use the `from_iterable` or `from_iterable_parallel` function.  They take an iterable.
 ```python
 an_iterable = [5, 78, 12, 26]
-iterator_chain.from_iterable(an_iterable)
+chain = iterator_chain.from_iterable(an_iterable)
+parallel_chain = iterator_chain.from_iterable_parallel(an_iterable)
 ```
 
-| Function | Arguments | Description | 
+| Function | Arguments | Description |
 | --- | --- | --- |
 | `from_iterable` | • `iterable` - An iterable to be used in the iterator chain | Starts the iterator chain with the supplied iterable.  Chaining and terminating methods can now be called on the result. |
+| `from_iterable_parallel` | • `iterable` - An iterable to be used in the iterator chain<br/>• `chunksize` - Keyword.  How big of chunks to split the iterator up across the parallel execution units.  If unspecified or None, the chunk size will start at 1 and send that many elements to each execution unit.  The chunk size will then increment in powers of two and send that many items to each execution unit.  This is repeated until the iterator is exhausted.  This value is used as the default chunksize for all the following parallel based methods.  A specific parallel based method's chunksize can be overrided by supplying the `chunksize` keyword to that method. | Starts the iterator chain with the supplied iterable.  Chaining and terminating methods can now be called on the result.  Certain chaining and terminating methods will occur in parallel.  Parallel means separate processes to get around Python's GIL. |
 
 
 ### Continuing the chain
@@ -55,7 +57,7 @@ called.
 an actual value.  This value will depend on all the previous chaining methods being executed first.
 
 #### Chaining methods
-| Method | Arguments | Description | 
+| Method | Arguments | Description |
 | --- | --- | --- |
 | `map` | • `function` - A function that takes a single argument | Will run the `function` across all the elements in the iterator. |
 | `filter` | • `function` - A function that takes a single argument | Will run the `function` on every element.  `function` should return a truthy or falsy value.  On true, the element will stay; on false, the element will be removed. |
@@ -66,8 +68,14 @@ an actual value.  This value will depend on all the previous chaining methods be
 | `sort` | • `key` - Keyword.  A function of one argument that is used to extract a comparison key from each element<br/>• `cmp` - Keyword.  A Python 2.x "cmp" function that takes two arguments<br/>• `reverse` - Keyword.  If set to `True`, the elements will be sorted in the reverse order | Sorts the iterator based on the elements' values.  Use `key` or `cmp` to make a custom comparison.  If `key` is specified, `cmp` cannot be used.  This method is expensive because it must serialize all the values into a sequence. |
 | `reverse` |  | Reverses the iterator.  The last item will be first, and the first item will be last.  This method is expensive because it must serialize all the values into a list. |
 
+##### Parallel Versions
+| Method | Arguments | Description |
+| --- | --- | --- |
+| `map` | • `function` - A function that takes a single argument<br/>• `chunksize` - Keyword.  Overrides the chunksize supplied to the original `from_iterable_parallel`  | Will run the `function` across all the elements in the iterator in parallel. |
+| `filter` | • `function` - A function that takes a single argument<br/>• `chunksize` - Keyword.  Overrides the chunksize supplied to the original `from_iterable_parallel` | Will run the `function` on every element in parallel.  `function` should return a truthy or falsy value.  On true, the element will stay; on false, the element will be removed. |
+
 #### Terminating methods
-| Method | Arguments | Description | 
+| Method | Arguments | Description |
 | --- | --- | --- |
 | `list` |  | Serializes the iterator chain into a `list` and returns it. |
 | `count` |  | Returns the number of elements in the iterator. |
@@ -81,6 +89,11 @@ an actual value.  This value will depend on all the previous chaining methods be
 | `all_match` | • `function` - A function that takes one argument and returns a boolean | Returns `True` only if _all_ the elements return `True` after applying the `function` to them.  Else returns `False`. |
 | `any_match` | • `function` - A function that takes one argument and returns a boolean | Returns `True` if just one element return `True` after applying the `function` to it.  If all elements result in `False`, `False` is returned. |
 | `none_match` | • `function` - A function that takes one argument and returns a boolean | Returns `True` only if _all_ the elements return `False` after applying the `function` to them.  Else returns `True`. |
+
+##### Parallel Versions
+| Method | Arguments | Description |
+| --- | --- | --- |
+| `for_each` | • `function` - A function that takes one argument and returns nothing<br/>• `chunksize` - Keyword.  Overrides the chunksize supplied to the original `from_iterable_parallel` | Executes `function` on every element in the iterator in parallel.  There is no return value.  If you are wanting to return a list of values based on the function, use `.map(function).list()`. |
 
 ## Examples
 ```python

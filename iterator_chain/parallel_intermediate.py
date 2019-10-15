@@ -32,7 +32,7 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
         Will run the `function` across all the elements in the iterator in parallel.
 
         :param function: A function that takes a single argument.
-        :param chunksize: How big of chunks to split the iterator up across the parallel execution units.  If unspecified or None, the chunk size will start at 1 and send that many elements to each execution unit.  The chunk size will then increment in powers of two and send that many items to each execution unit.  This is repeated until the iterator is exhausted.
+        :param chunksize: Overrides the chunksize supplied to the original `from_iterable_parallel`.
         :return: An intermediate object that subsequent chaining and terminating methods can be called on.
         """
         chunksize = chunksize or self._chunksize
@@ -48,7 +48,7 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
         Will run the `function` on every element in parallel.  `function` should return a truthy or falsy value.  On true, the element will stay; on false, the element will be removed.
 
         :param function: A function that takes a single argument.
-        :param chunksize: How big of chunks to split the iterator up across the parallel execution units.  If unspecified or None, the chunk size will start at 1 and send that many elements to each execution unit.  The chunk size will then increment in powers of two and send that many items to each execution unit.  This is repeated until the iterator is exhausted.
+        :param chunksize: Overrides the chunksize supplied to the original `from_iterable_parallel`.
         :return: An intermediate object that subsequent chaining and terminating methods can be called on.
         """
         chunksize = chunksize or self._chunksize
@@ -149,7 +149,7 @@ class _IntermediateParallelIteratorChain(_IntermediateIteratorChain):
         Executes `function` on every element in the iterator in parallel.  There is no return value.  If you are wanting to return a list of values based on the function, use `.map(function).list()`.
 
         :param function: A function that takes one argument and returns nothing.
-        :param chunksize: How big of chunks to split the iterator up across the parallel execution units.  If unspecified or None, the chunk size will start at 1 and send that many elements to each execution unit.  The chunk size will then increment in powers of two and send that many items to each execution unit.  This is repeated until the iterator is exhausted.
+        :param chunksize: Overrides the chunksize supplied to the original `from_iterable_parallel`.
         """
         chunksize = chunksize or self._chunksize
 
